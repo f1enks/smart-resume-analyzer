@@ -45,6 +45,30 @@ An intelligent web app that analyzes resumes using AI, built with **Flask (Pytho
 
 ## ⚙️ Getting Started
 
+### API Setup
+- Get an API Key:
+    - Visit: https://aistudio.google.com/app/apikey
+    - Sign in with your Google account
+    - Generate a new Gemini API key
+
+- Create a .env file in the backend folder:
+    - Content:
+        GEMINI_API_KEY=your_api_key_here
+
+- Load the API key in your Python code:
+    - In main.py or analyzer.py:
+        import os
+        from dotenv import load_dotenv
+
+        load_dotenv()
+        api_key = os.getenv("GEMINI_API_KEY")
+
+- Install the dotenv library if needed:
+    - pip install python-dotenv
+
+- Add .env to .gitignore to keep the key private:
+    - .env
+
 ### Backend
 ```bash
 cd backend
