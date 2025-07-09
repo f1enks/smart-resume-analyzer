@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import AIFeedback from "./AIFeedback";
 
 function ResumeUpload() {
   const [file, setFile] = useState(null);
@@ -30,6 +31,7 @@ function ResumeUpload() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!file) {
       setError("Please select a valid PDF file.");
       toast.error("Please select a PDF file.");
@@ -37,9 +39,10 @@ function ResumeUpload() {
     }
 
     setError("");
+    setLoading(true);
+
     const formData = new FormData();
     formData.append("file", file);
-    setLoading(true);
 
     try {
       const response = await fetch("http://127.0.0.1:5000/analyze", {
@@ -61,67 +64,96 @@ function ResumeUpload() {
     }
   };
 
-  const getJobFitColor = (fit) => {
-    if (!fit) return "bg-gray-200 text-gray-800 dark:bg-gray-600 dark:text-white";
-    if (fit.toLowerCase().includes("high")) return "bg-green-100 text-green-700 dark:bg-green-700 dark:text-green-100";
-    if (fit.toLowerCase().includes("medium")) return "bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100";
-    return "bg-red-100 text-red-700 dark:bg-red-700 dark:text-red-100";
-  };
-
   return (
-    <section
-      id="upload"
-      className="pt-20 pb-32 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100"
-    >
-      <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border dark:border-gray-700">
-        <h2 className="text-2xl font-bold text-center text-blue-700 dark:text-blue-400 mb-6">
-          Upload Your Resume
-        </h2>
+    <>
+      <section
+        id="upload"
+        className="pt-20 pb-10 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100"
+      >
+        <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-center text-blue-700 dark:text-blue-400 mb-6">
+            Upload Your Resume
+          </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500
-              file:mr-4 file:py-2 file:px-4
-              file:border file:rounded-md file:text-sm
-              file:bg-blue-50 file:text-blue-700
-              file:dark:bg-gray-700 file:dark:text-gray-100
-              hover:file:bg-blue-100 dark:hover:file:bg-gray-600"
-          />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handleFileChange}
+              className="block w-full text-sm text-gray-500
+                file:mr-4 file:py-2 file:px-4
+                file:border file:rounded-md file:text-sm
+                file:bg-blue-50 file:text-blue-700
+                file:dark:bg-gray-700 file:dark:text-gray-100
+                hover:file:bg-blue-100 dark:hover:file:bg-gray-600"
+            />
 
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+            {error && <p className="text-red-600 text-sm">{error}</p>}
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200"
-          >
-            {loading ? "Analyzing..." : "Analyze Resume"}
-          </button>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-200 flex justify-center items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                  Analyzing...
+                </>
+              ) : (
+                "Analyze Resume"
+              )}
+            </button>
 
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Only PDF files under 5 MB are accepted.
-          </p>
-        </form>
-
-        {result && (
-          <div className="mt-8 text-sm bg-blue-50 dark:bg-gray-700 p-5 rounded-lg shadow-inner space-y-2 border border-blue-200 dark:border-gray-600">
-            <p><strong>Name:</strong> {result.name}</p>
-            <p><strong>Email:</strong> {result.email}</p>
-            <p><strong>Phone:</strong> {result.phone}</p>
-            <p><strong>Skills:</strong> {result.skills?.join(", ")}</p>
-            <p><strong>Score:</strong> <span className="font-bold text-blue-700 dark:text-blue-300">{result.score}</span></p>
-            <p>
-              <strong>Job Fit:</strong>{" "}
-              <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${getJobFitColor(result.job_fit)}`}>
-                {result.job_fit}
-              </span>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Only PDF files under 5 MB are accepted.
             </p>
+          </form>
+
+          {result && (
+            <div className="mt-8 text-sm bg-blue-50 dark:bg-gray-700 p-5 rounded-lg shadow-inner space-y-2 border border-blue-200 dark:border-gray-600">
+              {result.name && <p><strong>Name:</strong> {result.name}</p>}
+              {result.email && <p><strong>Email:</strong> {result.email}</p>}
+              {result.phone && <p><strong>Phone:</strong> {result.phone}</p>}
+              {result.linkedin && <p><strong>LinkedIn:</strong> {result.linkedin}</p>}
+              {result.github && <p><strong>GitHub:</strong> {result.github}</p>}
+              {result.score && (
+                <p>
+                  <strong>Score:</strong>{" "}
+                  <span className="font-bold text-blue-700 dark:text-blue-300">{result.score}/100</span>
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {result?.ai_feedback && (
+        <section className="bg-white dark:bg-gray-900 py-16 px-4 md:px-10 lg:px-20">
+          <div className="max-w-6xl mx-auto">
+            <AIFeedback feedback={result.ai_feedback} />
           </div>
-        )}
-      </div>
-    </section>
+        </section>
+      )}
+    </>
   );
 }
 

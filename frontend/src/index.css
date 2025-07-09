@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.prose ul {
+  list-style-type: disc !important;
+  padding-left: 1.5rem; /* Indent bullets */
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose li {
+  margin-bottom: 0.4rem; /* Space between bullet points */
+}
+
+.prose li strong {
+  text-decoration: underline; /* Optional: underline bold subpoint titles */
+}
